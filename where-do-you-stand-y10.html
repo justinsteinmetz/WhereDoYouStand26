@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Where Do You Stand? — Thinking About Politics</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Spline+Sans:wght@400;500;600&display=swap');
+
+  :root {
+    --ink: #1a1715;
+    --paper: #f4ece0;
+    --paper2: #ece0cf;
+    --card: #fffaf2;
+    --accent: #d6492f;      /* warm red-orange */
+    --accent2: #2f6d6a;     /* teal */
+    --gold: #e0a93b;
+    --muted: #6f655b;
+    --line: #d8cbb8;
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-body: 'Spline Sans', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--font-body);
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    background-image: radial-gradient(circle at 12% 18%, rgba(224,169,59,.10), transparent 38%),
+                      radial-gradient(circle at 88% 82%, rgba(47,109,106,.10), transparent 40%);
+    min-height: 100vh;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 28px 20px 80px; }
+
+  .screen { display: none; animation: rise .5s ease both; }
+  .screen.active { display: block; }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+  /* ---------- LANDING ---------- */
+  .eyebrow { font-family: var(--font-body); font-weight: 600; letter-spacing: .14em; text-transform: uppercase; font-size: .72rem; color: var(--accent); }
+  h1 { font-family: var(--font-display); font-weight: 900; font-size: clamp(2.4rem, 7vw, 4rem); line-height: .98; margin: 10px 0 6px; letter-spacing: -.02em; }
+  h1 .em { font-style: italic; color: var(--accent2); }
+  .lede { font-size: 1.12rem; color: var(--muted); max-width: 56ch; margin: 18px 0 6px; }
+  .promise { font-size: 1rem; background: var(--card); border: 1.5px solid var(--line); border-left: 5px solid var(--gold); border-radius: 4px; padding: 16px 18px; margin: 24px 0; }
+  .promise strong { font-family: var(--font-display); }
+
+  .tension-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px,1fr)); gap: 12px; margin: 26px 0; }
+  .t-card { background: var(--card); border: 1.5px solid var(--line); border-radius: 8px; padding: 14px 16px; }
+  .t-card .pair { font-family: var(--font-display); font-weight: 600; font-size: 1.05rem; }
+  .t-card .pair .vs { color: var(--accent); font-style: italic; padding: 0 4px; }
+  .t-card .q { font-size: .85rem; color: var(--muted); margin-top: 4px; }
+
+  .btn { font-family: var(--font-body); font-weight: 600; font-size: 1rem; border: none; border-radius: 999px; padding: 13px 26px; cursor: pointer; transition: transform .12s, box-shadow .12s; }
+  .btn-primary { background: var(--accent); color: #fff; box-shadow: 0 4px 0 #a8341f; }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #a8341f; }
+  .btn-primary:active { transform: translateY(2px); box-shadow: 0 2px 0 #a8341f; }
+  .btn-secondary { background: transparent; color: var(--ink); border: 1.5px solid var(--ink); }
+  .btn-secondary:hover { background: var(--ink); color: var(--paper); }
+  .btn-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+
+  .teacher-note { margin-top: 30px; font-size: .82rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px; }
+  .teacher-note summary { cursor: pointer; font-weight: 600; color: var(--ink); }
+  .teacher-note p { margin-top: 8px; }
+
+  /* ---------- QUIZ ---------- */
+  .progress-wrap { display: flex; align-items: center; gap: 12px; margin-bottom: 26px; }
+  .progress-bar { flex: 1; height: 8px; background: var(--paper2); border: 1.5px solid var(--line); border-radius: 999px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--accent)); width: 0%; transition: width .35s ease; }
+  .progress-text { font-size: .8rem; color: var(--muted); font-weight: 600; white-space: nowrap; }
+
+  .scenario { background: var(--card); border: 1.5px solid var(--line); border-radius: 14px; padding: 26px 24px; box-shadow: 0 10px 30px -18px rgba(0,0,0,.4); }
+  .scen-tag { font-size: .7rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--accent2); }
+  .scen-text { font-family: var(--font-display); font-size: clamp(1.3rem, 3.6vw, 1.7rem); line-height: 1.28; margin: 10px 0 22px; font-weight: 600; }
+
+  .choices { display: flex; flex-direction: column; gap: 9px; }
+  .choice { text-align: left; background: var(--paper); border: 1.5px solid var(--line); border-radius: 10px; padding: 13px 16px; cursor: pointer; font-family: var(--font-body); font-size: .98rem; color: var(--ink); transition: all .14s; display: flex; align-items: center; gap: 12px; }
+  .choice:hover { border-color: var(--accent2); transform: translateX(3px); }
+  .choice.sel { background: var(--accent2); color: #fff; border-color: var(--accent2); }
+  .choice .dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid currentColor; flex-shrink: 0; opacity: .6; }
+  .choice.sel .dot { background: #fff; opacity: 1; }
+  .choice .lab { font-size: .72rem; font-weight: 600; opacity: .6; margin-left: auto; text-transform: uppercase; letter-spacing: .05em; }
+
+  .nav-row { display: flex; justify-content: space-between; gap: 10px; margin-top: 20px; }
+  .link-btn { background: none; border: none; color: var(--muted); font-family: var(--font-body); font-size: .9rem; cursor: pointer; text-decoration: underline; }
+
+  /* ---------- RESULTS ---------- */
+  .res-eyebrow { font-family: var(--font-body); font-weight: 600; letter-spacing: .14em; text-transform: uppercase; font-size: .72rem; color: var(--accent2); }
+  h2 { font-family: var(--font-display); font-weight: 900; font-size: clamp(1.9rem,5vw,2.8rem); line-height: 1; margin: 8px 0 4px; letter-spacing: -.01em; }
+  .res-sub { color: var(--muted); font-size: 1.02rem; max-width: 56ch; margin-bottom: 26px; }
+
+  .map { background: var(--card); border: 1.5px solid var(--line); border-radius: 14px; padding: 22px 22px 8px; margin-bottom: 22px; }
+  .lean { margin-bottom: 18px; }
+  .lean-head { display: flex; justify-content: space-between; font-size: .76rem; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 5px; }
+  .lean-head .l { color: var(--accent2); }
+  .lean-head .r { color: var(--accent); }
+  .lean-track { position: relative; height: 12px; background: linear-gradient(90deg, rgba(47,109,106,.18), rgba(214,73,47,.18)); border: 1.5px solid var(--line); border-radius: 999px; }
+  .lean-mark { position: absolute; top: 50%; width: 20px; height: 20px; border-radius: 50%; background: var(--ink); border: 3px solid var(--card); transform: translate(-50%,-50%); transition: left .6s cubic-bezier(.3,1.4,.5,1); box-shadow: 0 2px 6px rgba(0,0,0,.3); }
+  .lean-mid { position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1.5px; background: var(--line); }
+  .lean-read { font-size: .9rem; margin-top: 6px; color: var(--ink); }
+  .lean-read b { font-family: var(--font-display); }
+  .lean-read .neutral { color: var(--muted); font-style: italic; }
+
+  .panel { background: var(--card); border: 1.5px solid var(--line); border-radius: 14px; padding: 20px 22px; margin-bottom: 16px; }
+  .panel h3 { font-family: var(--font-display); font-size: 1.25rem; margin-bottom: 4px; }
+  .panel .hint { font-size: .82rem; color: var(--muted); margin-bottom: 14px; }
+  .qlist { display: flex; flex-direction: column; gap: 11px; }
+  .qitem { background: var(--paper); border: 1.5px solid var(--line); border-left: 4px solid var(--accent2); border-radius: 6px; padding: 12px 15px; font-size: .96rem; }
+  .qitem.flip { border-left-color: var(--accent); }
+
+  .disagree { background: var(--paper); border: 1.5px dashed var(--accent); border-radius: 10px; padding: 14px 16px; margin-top: 4px; }
+  .disagree .who { font-family: var(--font-display); font-weight: 600; font-size: 1.05rem; color: var(--accent); }
+  .disagree .ch { font-size: .94rem; margin-top: 4px; }
+
+  details.explain { margin-top: 8px; }
+  details.explain summary { cursor: pointer; font-weight: 600; font-family: var(--font-display); font-size: 1.1rem; }
+  .pos-card { border: 1.5px solid var(--line); border-radius: 8px; padding: 12px 14px; margin-top: 10px; background: var(--paper); }
+  .pos-card .nm { font-weight: 600; color: var(--accent2); }
+  .pos-card .ds { font-size: .9rem; color: var(--muted); margin-top: 2px; }
+
+  @media print {
+    body { background: #fff; }
+    .no-print { display: none !important; }
+    .panel, .map, .scenario { box-shadow: none; }
+  }
+  .mt { margin-top: 18px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ LANDING ============ -->
+  <section id="s-landing" class="screen active">
+    <p class="eyebrow">A thinking tool · not a test</p>
+    <h1>Where Do <span class="em">You</span> Stand?</h1>
+    <p class="lede">Politics isn't a straight line from left to right. It's a set of <strong>tensions</strong> — pulls in two directions, where reasonable people land in different places.</p>
+    <p class="lede">You'll face some real situations and decide what you'd do. There are no right answers, and this won't tell you "what you are." It'll show you where you lean, where you'd switch sides, and who you'd have to argue with.</p>
+
+    <div class="promise">
+      <strong>This tool will never label you.</strong> It doesn't sort you into a party or an "-ism". The point isn't to find out who you are — it's to help you notice <em>how you think</em>, and to give you something to argue about.
+    </div>
+
+    <p class="eyebrow mt">The six tensions</p>
+    <div class="tension-grid" id="tension-grid"></div>
+
+    <div class="btn-row no-print">
+      <button class="btn btn-primary" onclick="start()">Start →</button>
+      <span class="progress-text">27 situations · about 8 minutes</span>
+    </div>
+
+    <details class="teacher-note no-print">
+      <summary>A note for teachers</summary>
+      <p>This is a discussion tool, not an assessment. It deliberately avoids ideology labels and verdicts: students see a profile across six plain-language tensions, a set of reflection questions, a "someone who'd disagree" prompt for debate work, and an optional explainer of positions people hold (none of which is pinned on the student). Each situation is a concrete dilemma rather than an abstract proposition, to measure judgement rather than vocabulary. Use it as a lesson starter, a unit touchstone students revisit, debate preparation, or a take-home. Results can be printed for class discussion. Nothing is stored or sent anywhere.</p>
+    </details>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section id="s-quiz" class="screen">
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="pfill"></div></div>
+      <div class="progress-text"><span id="qn">1</span> / <span id="qt">27</span></div>
+    </div>
+    <div class="scenario">
+      <div class="scen-tag" id="scen-tag">SITUATION</div>
+      <div class="scen-text" id="scen-text">—</div>
+      <div class="choices" id="choices"></div>
+    </div>
+    <div class="nav-row no-print">
+      <button class="link-btn" onclick="prev()" id="prevbtn" style="visibility:hidden">← Back</button>
+      <button class="link-btn" onclick="skip()">Not sure — skip</button>
+    </div>
+  </section>
+
+  <!-- ============ RESULTS ============ -->
+  <section id="s-results" class="screen">
+    <p class="res-eyebrow">Your thinking map</p>
+    <h2 id="res-headline">Where you lean</h2>
+    <p class="res-sub" id="res-sub"></p>
+
+    <div class="map" id="lean-map"></div>
+
+    <div class="panel">
+      <h3>Questions for you</h3>
+      <p class="hint">The interesting part isn't where you landed — it's <em>why</em>, and <em>when you'd switch</em>.</p>
+      <div class="qlist" id="reflect"></div>
+    </div>
+
+    <div class="panel">
+      <h3>Someone who'd disagree</h3>
+      <p class="hint">Good debaters can argue the other side. Here's a person who sees it differently — what would you say to them?</p>
+      <div id="disagree"></div>
+    </div>
+
+    <div class="panel">
+      <h3 style="margin-bottom:8px">Positions people hold</h3>
+      <p class="hint">These are some ways of thinking that exist in the world — <strong>not labels for you</strong>. See which ones overlap with your leanings, and which you'd push back on.</p>
+      <details class="explain"><summary>Show the spectrum of views →</summary><div id="positions"></div></details>
+    </div>
+
+    <div class="btn-row no-print mt">
+      <button class="btn btn-primary" onclick="restart()">↺ Start again</button>
+      <button class="btn btn-secondary" onclick="window.print()">🖨 Print for discussion</button>
+    </div>
+  </section>
+
+</div>
+
+<script>
+// ── SIX TENSIONS ──────────────────────────────────────────────────────
+// pos = the pole a POSITIVE score leans toward; neg = negative pole.
+const TENSIONS = {
+  FREE:  { name:'Freedom & Order',     pos:'Freedom',   neg:'Order',      q:'When should rules limit what people do?' },
+  ECON:  { name:'Market & State',      pos:'Market',    neg:'State',      q:'Who should run things — business or government?' },
+  WORLD: { name:'Nation & World',      pos:'World',     neg:'Nation',     q:'Look after our own first, or act globally?' },
+  CHANGE:{ name:'Change & Tradition',  pos:'Change',    neg:'Tradition',  q:'Remake what we have, or keep what works?' },
+  COMM:  { name:'Individual & Community',pos:'Community',neg:'Individual', q:"Whose responsibility — yours, or everyone's?" },
+  TRUST: { name:'Trust & Question',    pos:'Trust',     neg:'Question',   q:'Do those in charge get the benefit of the doubt?' },
+};
+const TKEYS = Object.keys(TENSIONS);
+
+// ── SCENARIOS ─────────────────────────────────────────────────────────
+// dir = sign that AGREE/first-choice pushes. Each item asks a dilemma with
+// two concrete options; choosing the "pos" option pushes toward TENSIONS.pos.
+const ITEMS = [
+ {id:'f1',t:'FREE',dir:-1,text:"Your school wants cameras in every hallway to stop bullying and theft. Everyone would be safer — but everyone is filmed all day.",pos:"Keep it free — no cameras",neg:"Safer with cameras"},
+ {id:'f2',t:'FREE',dir:+1,text:"A new law would let police search anyone's phone at a train station without a reason, to catch criminals faster.",pos:"No — leave phones private",neg:"Yes — if it catches criminals"},
+ {id:'f3',t:'FREE',dir:-1,text:"Your town wants a 10pm curfew for under-18s to cut late-night trouble — even if you've done nothing wrong.",pos:"No curfew — let people out",neg:"Curfew keeps order"},
+ {id:'f4',t:'FREE',dir:+1,text:"Someone posts something online lots of people find offensive. It isn't a threat. Should they be allowed to say it?",pos:"Allowed to say it",neg:"Should be stopped"},
+ {id:'f5',t:'FREE',dir:-1,text:"A festival wants strict rules and bag searches so nothing goes wrong — meaning long queues and less freedom.",pos:"Less hassle, more freedom",neg:"Strict rules, stay safe"},
+
+ {id:'e1',t:'ECON',dir:-1,text:"Your town's only bus company keeps raising prices. Should the council take it over, or leave it to the market?",pos:"Leave it to the market",neg:"Council should run it"},
+ {id:'e2',t:'ECON',dir:-1,text:"Should water and electricity be run by government to keep prices fair, or by private companies competing?",pos:"Private companies compete",neg:"Government runs it"},
+ {id:'e3',t:'ECON',dir:+1,text:"A company invents something brilliant and makes a huge profit. Mostly a good thing, or mostly a problem?",pos:"Good — reward for effort",neg:"Problem — too much for a few"},
+ {id:'e4',t:'ECON',dir:-1,text:"Should government set a high minimum wage so everyone earns enough, even if some small businesses say they can't afford it?",pos:"No — let businesses decide",neg:"Yes — guarantee a wage"},
+ {id:'e5',t:'ECON',dir:-1,text:"If someone can't find work, whose job is it mainly to help — the government, or the person themselves?",pos:"Mostly the person",neg:"Mostly the government"},
+
+ {id:'w1',t:'WORLD',dir:+1,text:"A disaster hits a faraway country. Should your country spend its own money helping, or focus on problems at home first?",pos:"Help them abroad",neg:"Home problems first"},
+ {id:'w2',t:'WORLD',dir:+1,text:"Should countries give up some of their own control to a group like the UN if it helps solve big problems like climate change?",pos:"Yes — work together",neg:"No — keep our control"},
+ {id:'w3',t:'WORLD',dir:+1,text:"People fleeing war want to settle in your country. Take in as many as possible, or limit numbers to look after our own first?",pos:"Take in as many as we can",neg:"Limit the numbers"},
+ {id:'w4',t:'WORLD',dir:+1,text:"More important: to be proud of your own country's traditions, or to see yourself first as a citizen of the world?",pos:"Citizen of the world",neg:"Proud of my country"},
+ {id:'w5',t:'WORLD',dir:+1,text:"Should your country buy cheaper goods made abroad, or pay more to protect jobs and factories at home?",pos:"Cheaper from abroad",neg:"Protect jobs at home"},
+
+ {id:'c1',t:'CHANGE',dir:+1,text:"An old local tradition leaves some people out by today's standards. Keep it because it's part of who you are, or change it to include everyone?",pos:"Change it to include everyone",neg:"Keep the tradition"},
+ {id:'c2',t:'CHANGE',dir:+1,text:"Society is changing faster than ever. Mostly exciting and good, or are we losing things worth keeping?",pos:"Exciting — change is good",neg:"We're losing too much"},
+ {id:'c3',t:'CHANGE',dir:+1,text:"Should schools teach mostly the proven knowledge of the past, or focus on new skills no one has fully figured out yet?",pos:"New skills for the future",neg:"Proven knowledge of the past"},
+ {id:'c4',t:'CHANGE',dir:-1,text:"When something has worked for a long time, is that a good reason to keep it, or not really a reason at all?",pos:"Not really a reason",neg:"Yes — a good reason to keep it"},
+
+ {id:'m1',t:'COMM',dir:-1,text:"Should people be free to make choices that harm only themselves, or should the community step in to protect them?",pos:"Community should step in",neg:"Leave them to choose"},
+ {id:'m2',t:'COMM',dir:+1,text:"A new park helps the whole community but means everyone's taxes rise a little — including people who'll never use it.",pos:"Fair — it's for everyone",neg:"Not fair on non-users"},
+ {id:'m3',t:'COMM',dir:+1,text:"Is success mostly down to your own hard work, or mostly down to the help and luck you got from others?",pos:"Help and luck from others",neg:"My own hard work"},
+ {id:'m4',t:'COMM',dir:+1,text:"Should richer people pay more so everyone has decent healthcare and schools, or should people mostly keep what they earn?",pos:"Pay more — share it",neg:"Keep what you earn"},
+
+ {id:'t1',t:'TRUST',dir:+1,text:"A government expert says a new policy is safe and necessary. Mostly trust them, or stay sceptical until you see proof yourself?",pos:"Mostly trust the expert",neg:"Stay sceptical"},
+ {id:'t2',t:'TRUST',dir:+1,text:"When the news reports something big, mostly believe it, or assume there's more to the story you're not being told?",pos:"Mostly believe it",neg:"Assume there's more"},
+ {id:'t3',t:'TRUST',dir:+1,text:"Do people in charge — politicians, police, big companies — mostly deserve the benefit of the doubt, or mostly need watching closely?",pos:"Benefit of the doubt",neg:"Need watching closely"},
+ {id:'t4',t:'TRUST',dir:+1,text:"If a rule comes from someone in authority, is that a good reason to follow it, or should every rule justify itself?",pos:"Authority is a good reason",neg:"Every rule must justify itself"},
+];
+
+// "Positions people hold" — described as views in the world, never pinned on student.
+// Each lists which leanings it tends to go with, for overlap discussion.
+const POSITIONS = [
+  { nm:'The free-marketeer', ds:'Trusts businesses and competition more than government; wants people left free to choose and to keep what they earn.', leans:{ECON:+1,COMM:-1,FREE:+1} },
+  { nm:'The social reformer', ds:'Thinks the community should share resources so everyone has a fair shot; comfortable changing old systems.', leans:{COMM:+1,ECON:-1,CHANGE:+1} },
+  { nm:'The traditionalist', ds:'Values what has worked over time, national identity, and a strong sense of order.', leans:{CHANGE:-1,WORLD:-1,FREE:-1} },
+  { nm:'The globalist', ds:'Sees the big problems as shared across borders and worth co-operating on, even at some cost to national control.', leans:{WORLD:+1,CHANGE:+1} },
+  { nm:'The libertarian', ds:'Wants maximum personal freedom and minimum interference — from government, community, or authority.', leans:{FREE:+1,COMM:-1,TRUST:-1} },
+  { nm:'The sceptic', ds:'Keeps a close eye on the powerful and questions official accounts; slow to give the benefit of the doubt.', leans:{TRUST:-1} },
+  { nm:'The institutionalist', ds:'Believes experts, news, courts and authority generally deserve trust and keep society working.', leans:{TRUST:+1} },
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────
+let order = [], idx = 0, picks = {};
+
+function shuffle(a){ a=[...a]; for(let i=a.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[a[i],a[j]]=[a[j],a[i]];} return a; }
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); }
+
+// landing tension cards
+(function(){
+  const g=document.getElementById('tension-grid');
+  TKEYS.forEach(k=>{
+    const t=TENSIONS[k];
+    const d=document.createElement('div'); d.className='t-card';
+    d.innerHTML=`<div class="pair">${t.pos}<span class="vs">vs</span>${t.neg}</div><div class="q">${t.q}</div>`;
+    g.appendChild(d);
+  });
+})();
+
+function start(){ order=shuffle(ITEMS); idx=0; picks={}; document.getElementById('qt').textContent=order.length; show('s-quiz'); render(); }
+
+function render(){
+  const it=order[idx];
+  document.getElementById('qn').textContent=idx+1;
+  document.getElementById('pfill').style.width=((idx)/order.length*100)+'%';
+  document.getElementById('scen-tag').textContent='SITUATION '+(idx+1);
+  document.getElementById('scen-text').textContent=it.text;
+  const c=document.getElementById('choices'); c.innerHTML='';
+  // two main choices (pos / neg) plus a middle
+  const opts=[
+    {v:+1,label:it.pos},
+    {v:0,label:'It depends / somewhere in between'},
+    {v:-1,label:it.neg},
+  ];
+  opts.forEach(o=>{
+    const b=document.createElement('button'); b.className='choice'+(picks[it.id]===o.v?' sel':'');
+    b.innerHTML=`<span class="dot"></span><span>${o.label}</span>`;
+    b.onclick=()=>{ picks[it.id]=o.v; next(); };
+    c.appendChild(b);
+  });
+  document.getElementById('prevbtn').style.visibility = idx>0?'visible':'hidden';
+}
+function next(){ if(idx<order.length-1){ idx++; render(); } else finish(); }
+function prev(){ if(idx>0){ idx--; render(); } }
+function skip(){ picks[order[idx].id]=0; next(); }
+
+// ── SCORING ───────────────────────────────────────────────────────────
+function computeScores(){
+  const sum={}, max={};
+  TKEYS.forEach(k=>{sum[k]=0;max[k]=0;});
+  ITEMS.forEach(it=>{
+    const p=picks[it.id];
+    if(p===undefined) return;
+    // The first option (v=+1) is always authored as the POSITIVE pole of the
+    // tension, the third (v=-1) as the negative pole, so the pick maps directly.
+    sum[it.t]+= p;
+    max[it.t]+= 1;
+  });
+  const sc={};
+  TKEYS.forEach(k=> sc[k]= max[k]? Math.round(sum[k]/max[k]*100) : 0 );
+  return sc;
+}
+
+function finish(){
+  document.getElementById('pfill').style.width='100%';
+  const sc=computeScores();
+  renderResults(sc);
+  show('s-results');
+}
+
+function renderResults(sc){
+  // headline: name the 1-2 strongest leans, plainly
+  const ranked=TKEYS.slice().sort((a,b)=>Math.abs(sc[b])-Math.abs(sc[a]));
+  const strong=ranked.filter(k=>Math.abs(sc[k])>=34).slice(0,2);
+  const sub=document.getElementById('res-sub');
+  if(strong.length){
+    const phr=strong.map(k=>{const t=TENSIONS[k];return `<b>${sc[k]>0?t.pos:t.neg}</b>`;}).join(' and ');
+    sub.innerHTML=`Your clearest leanings are toward ${phr}. But look at where you sat near the middle — those are the places you're still deciding, and the most interesting to talk about.`;
+  } else {
+    sub.innerHTML=`You sat near the middle on most tensions — you weigh both sides rather than committing hard. That's a real position, not a lack of one. The questions below are where it gets interesting.`;
+  }
+
+  // lean map
+  const map=document.getElementById('lean-map'); map.innerHTML='';
+  TKEYS.forEach(k=>{
+    const t=TENSIONS[k], v=sc[k];
+    const pos=(100 - v)/2; // v=+100 -> 0% (left = pos pole), v=-100 -> 100% (right)
+    let read;
+    if(Math.abs(v)<18) read=`<span class="neutral">Right in the balance — you see both sides.</span>`;
+    else { const pole=v>0?t.pos:t.neg; const strength=Math.abs(v)>=60?'strongly':Math.abs(v)>=34?'clearly':'slightly'; read=`You lean ${strength} toward <b>${pole}</b>.`; }
+    const row=document.createElement('div'); row.className='lean';
+    row.innerHTML=`
+      <div class="lean-head"><span class="l">${t.pos}</span><span class="r">${t.neg}</span></div>
+      <div class="lean-track"><div class="lean-mid"></div><div class="lean-mark" style="left:${pos}%"></div></div>
+      <div class="lean-read">${read}</div>`;
+    map.appendChild(row);
+  });
+
+  // reflection questions: target the 2 strongest leans + 1 most-neutral
+  const refl=document.getElementById('reflect'); refl.innerHTML='';
+  const neutralK=ranked[ranked.length-1];
+  const targets=[...strong];
+  if(!targets.includes(neutralK)) targets.push(neutralK);
+  const RQ={
+    FREE:k=>`You leaned toward <b>${TENSIONS.FREE[k>0?'pos':'neg']}</b>. Can you think of a real situation where you'd want the opposite — more ${k>0?'order':'freedom'}?`,
+    ECON:k=>`On who runs things, you leaned <b>${TENSIONS.ECON[k>0?'pos':'neg']}</b>. Is there something you'd never want run that way? Why that one?`,
+    WORLD:k=>`You leaned <b>${TENSIONS.WORLD[k>0?'pos':'neg']}</b>. Where's the limit — when does "${k>0?'help everyone':'look after our own'}" stop being the right call?`,
+    CHANGE:k=>`You leaned toward <b>${TENSIONS.CHANGE[k>0?'pos':'neg']}</b>. Name one thing you'd fight to ${k>0?'keep exactly as it is':'change immediately'}. Does that complicate your lean?`,
+    COMM:k=>`You leaned <b>${TENSIONS.COMM[k>0?'pos':'neg']}</b>. Whose responsibility is a person's bad luck — and does your answer change if it was their own choices?`,
+    TRUST:k=>`You leaned toward <b>${TENSIONS.TRUST[k>0?'pos':'neg']}</b>. Who's one group you'd trust far less than the rest? What did they do to lose it?`,
+  };
+  targets.forEach(k=>{
+    const v=sc[k]||0;
+    const d=document.createElement('div'); d.className='qitem'+(v<0?' flip':'');
+    d.innerHTML=(RQ[k]?RQ[k](v>=0?1:-1):'');
+    refl.appendChild(d);
+  });
+  // always add a switch-question
+  const sw=document.createElement('div'); sw.className='qitem';
+  sw.innerHTML=`Across all six, which one were you <em>least</em> sure about? That's the one worth reading and arguing about most.`;
+  refl.appendChild(sw);
+
+  // someone who'd disagree — mirror their strongest lean
+  const dis=document.getElementById('disagree'); dis.innerHTML='';
+  const topK = strong[0] || ranked[0];
+  const tv = sc[topK]||0;
+  const t=TENSIONS[topK];
+  const theirPole = tv>=0? t.pos : t.neg;
+  const oppPole = tv>=0? t.neg : t.pos;
+  // find an item on that tension to dramatise
+  const exItem = ITEMS.find(i=>i.t===topK);
+  const box=document.createElement('div'); box.className='disagree';
+  box.innerHTML=`<div class="who">Someone who stands for ${oppPole}</div>
+    <div class="ch">You leaned toward <b>${theirPole}</b>. They'd take the other view — for example, on this: “${exItem?exItem.text:''}” &nbsp;<br><br>
+    <b>Your task:</b> what's the strongest thing <em>they</em> could say to you — and how would you answer it without just repeating yourself?</div>`;
+  dis.appendChild(box);
+
+  // positions people hold — overlap scored, but framed as views not labels
+  const pos=document.getElementById('positions'); pos.innerHTML='';
+  const scored=POSITIONS.map(p=>{
+    let m=0,n=0;
+    Object.entries(p.leans).forEach(([k,dir])=>{ n++; if(Math.sign(sc[k]||0)===dir && Math.abs(sc[k])>=18) m++; });
+    return {...p, overlap: n? m/n : 0};
+  }).sort((a,b)=>b.overlap-a.overlap);
+  scored.forEach(p=>{
+    const tag = p.overlap>=0.66?'overlaps a lot with your leanings' : p.overlap>=0.34?'partly overlaps' : "you'd probably push back on this one";
+    const d=document.createElement('div'); d.className='pos-card';
+    d.innerHTML=`<div class="nm">${p.nm} <span style="font-weight:400;color:var(--muted);font-size:.82rem">— ${tag}</span></div><div class="ds">${p.ds}</div>`;
+    pos.appendChild(d);
+  });
+}
+
+function restart(){ show('s-landing'); }
+</script>
+</body>
+</html>
