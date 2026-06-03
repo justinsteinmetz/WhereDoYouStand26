@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Where Do You Stand? — Thinking About Politics</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Spline+Sans:wght@400;500;600&display=swap');
+
+  :root {
+    --ink: #1a1715;
+    --paper: #f4ece0;
+    --paper2: #ece0cf;
+    --card: #fffaf2;
+    --accent: #d6492f;
+    --accent2: #2f6d6a;
+    --gold: #e0a93b;
+    --muted: #6f655b;
+    --line: #d8cbb8;
+    --forced: #4a1a6b;
+    --forced-light: #f3ecfa;
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-body: 'Spline Sans', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--font-body); background: var(--paper); color: var(--ink); line-height: 1.55;
+    background-image: radial-gradient(circle at 12% 18%, rgba(224,169,59,.10), transparent 38%),
+                      radial-gradient(circle at 88% 82%, rgba(47,109,106,.10), transparent 40%);
+    min-height: 100vh; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 28px 20px 80px; }
+  .screen { display: none; animation: rise .5s ease both; }
+  .screen.active { display: block; }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+  /* LANDING */
+  .eyebrow { font-family: var(--font-body); font-weight: 600; letter-spacing: .14em; text-transform: uppercase; font-size: .72rem; color: var(--accent); }
+  h1 { font-family: var(--font-display); font-weight: 900; font-size: clamp(2.6rem, 8vw, 4.4rem); line-height: .95; margin: 10px 0 22px; letter-spacing: -.02em; }
+  h1 .em { font-style: italic; color: var(--accent2); }
+  .lede-single { font-size: 1.18rem; color: var(--muted); max-width: 52ch; margin-bottom: 28px; }
+  .btn { font-family: var(--font-body); font-weight: 600; font-size: 1rem; border: none; border-radius: 999px; padding: 14px 30px; cursor: pointer; transition: transform .12s, box-shadow .12s; }
+  .btn-primary { background: var(--accent); color: #fff; box-shadow: 0 4px 0 #a8341f; font-size: 1.08rem; }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #a8341f; }
+  .btn-primary:active { transform: translateY(2px); box-shadow: 0 2px 0 #a8341f; }
+  .btn-secondary { background: transparent; color: var(--ink); border: 1.5px solid var(--ink); }
+  .btn-secondary:hover { background: var(--ink); color: var(--paper); }
+  .btn-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+  .meta-line { font-size: .85rem; color: var(--muted); margin-top: 10px; }
+
+  .landing-details { margin-top: 32px; border-top: 1px solid var(--line); padding-top: 20px; display: flex; flex-direction: column; gap: 0; }
+  .landing-details details { border-bottom: 1px solid var(--line); }
+  .landing-details details summary { cursor: pointer; font-weight: 600; font-size: .9rem; padding: 12px 0; list-style: none; display: flex; justify-content: space-between; align-items: center; color: var(--ink); }
+  .landing-details details summary::-webkit-details-marker { display: none; }
+  .landing-details details summary::after { content: '+'; color: var(--muted); font-size: 1.1rem; transition: transform .2s; }
+  .landing-details details[open] summary::after { content: '−'; }
+  .landing-details details .inner { padding: 0 0 16px; font-size: .88rem; color: var(--muted); }
+
+  .tension-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 10px; margin-top: 10px; }
+  .t-card { background: var(--card); border: 1.5px solid var(--line); border-radius: 8px; padding: 12px 14px; }
+  .t-card .pair { font-family: var(--font-display); font-weight: 600; font-size: 1rem; }
+  .t-card .pair .vs { color: var(--accent); font-style: italic; padding: 0 4px; }
+  .t-card .q { font-size: .82rem; color: var(--muted); margin-top: 3px; }
+
+  /* QUIZ */
+  .progress-wrap { display: flex; align-items: center; gap: 12px; margin-bottom: 26px; }
+  .progress-bar { flex: 1; height: 8px; background: var(--paper2); border: 1.5px solid var(--line); border-radius: 999px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--accent)); width: 0%; transition: width .35s ease; }
+  .progress-text { font-size: .8rem; color: var(--muted); font-weight: 600; white-space: nowrap; }
+  .scenario { background: var(--card); border: 1.5px solid var(--line); border-radius: 14px; padding: 26px 24px; box-shadow: 0 10px 30px -18px rgba(0,0,0,.4); }
+  .scen-tag { font-size: .7rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--accent2); }
+  .scen-text { font-family: var(--font-display); font-size: clamp(1.25rem, 3.4vw, 1.65rem); line-height: 1.28; margin: 10px 0 22px; font-weight: 600; }
+  .choices { display: flex; flex-direction: column; gap: 9px; }
+  .choice { text-align: left; background: var(--paper); border: 1.5px solid var(--line); border-radius: 10px; padding: 13px 16px; cursor: pointer; font-family: var(--font-body); font-size: .98rem; color: var(--ink); transition: all .14s; display: flex; align-items: center; gap: 12px; }
+  .choice:hover { border-color: var(--accent2); transform: translateX(3px); }
+  .choice.sel { background: var(--accent2); color: #fff; border-color: var(--accent2); }
+  .choice .dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid currentColor; flex-shrink: 0; opacity: .6; }
+  .choice.sel .dot { background: #fff; opacity: 1; }
+  .nav-row { display: flex; justify-content: space-between; gap: 10px; margin-top: 20px; }
+  .link-btn { background: none; border: none; color: var(--muted); font-family: var(--font-body); font-size: .9rem; cursor: pointer; text-decoration: underline; }
+
+  /* FORCED */
+  .scenario.is-forced { border-color: rgba(74,26,107,.35); background: var(--forced-light); }
+  .scenario.is-forced .scen-tag { color: var(--forced); }
+  .choice.forced-choice { background: #fff; border-color: rgba(74,26,107,.25); }
+  .choice.forced-choice:hover { border-color: var(--forced); transform: translateX(3px); }
+  .choice.forced-choice.sel { background: var(--forced); border-color: var(--forced); }
+  .forced-note { font-size: .82rem; color: var(--forced); margin-top: 10px; font-style: italic; opacity: .8; }
+
+  /* HESITATION */
+  .hes-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; max-height: 65vh; overflow-y: auto; padding-right: 4px; }
+  .hes-card { background: var(--card); border: 1.5px solid var(--line); border-radius: 10px; padding: 14px 16px; cursor: pointer; transition: all .14s; flex-shrink: 0; }
+  .hes-card:hover { border-color: var(--accent2); transform: translateX(3px); }
+  .hes-card.sel { border-color: var(--accent2); background: rgba(47,109,106,.08); }
+  .hes-card .hes-text { font-family: var(--font-display); font-weight: 600; font-size: .97rem; }
+  .hes-card .hes-ans { font-size: .82rem; color: var(--muted); margin-top: 3px; }
+  .hes-scroll-hint { font-size: .78rem; color: var(--muted); margin-top: 8px; text-align: center; font-style: italic; }
+
+  /* RESULTS */
+  .res-eyebrow { font-family: var(--font-body); font-weight: 600; letter-spacing: .14em; text-transform: uppercase; font-size: .72rem; color: var(--accent2); }
+  h2 { font-family: var(--font-display); font-weight: 900; font-size: clamp(1.9rem,5vw,2.8rem); line-height: 1; margin: 8px 0 4px; letter-spacing: -.01em; }
+  .res-sub { color: var(--muted); font-size: 1.02rem; max-width: 56ch; margin-bottom: 26px; }
+  .map { background: var(--card); border: 1.5px solid var(--line); border-radius: 14px; padding: 22px 22px 8px; margin-bottom: 22px; }
+  .lean { margin-bottom: 18px; }
+  .lean-head { display: flex; justify-content: space-between; font-size: .76rem; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 5px; }
+  .lean-head .l { color: var(--accent2); }
+  .lean-head .r { color: var(--accent); }
+  .lean-track { position: relative; height: 12px; background: linear-gradient(90deg, rgba(47,109,106,.18), rgba(214,73,47,.18)); border: 1.5px solid var(--line); border-radius: 999px; }
+  .lean-mark { position: absolute; top: 50%; width: 20px; height: 20px; border-radius: 50%; background: var(--ink); border: 3px solid var(--card); transform: translate(-50%,-50%); transition: left .6s cubic-bezier(.3,1.4,.5,1); box-shadow: 0 2px 6px rgba(0,0,0,.3); }
+  .lean-mid { position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1.5px; background: var(--line); }
+  .lean-read { font-size: .9rem; margin-top: 6px; color: var(--ink); }
+  .lean-read b { font-family: var(--font-display); }
+  .lean-read .neutral { color: var(--muted); font-style: italic; }
+  .panel { background: var(--card); border: 1.5px solid var(--line); border-radius: 14px; padding: 20px 22px; margin-bottom: 16px; }
+  .panel h3 { font-family: var(--font-display); font-size: 1.25rem; margin-bottom: 4px; }
+  .panel .hint { font-size: .82rem; color: var(--muted); margin-bottom: 14px; }
+  .qlist { display: flex; flex-direction: column; gap: 11px; }
+  .qitem { background: var(--paper); border: 1.5px solid var(--line); border-left: 4px solid var(--accent2); border-radius: 6px; padding: 12px 15px; font-size: .96rem; }
+  .qitem.flip { border-left-color: var(--accent); }
+  .qitem.hesitation { border-left-color: var(--forced); background: var(--forced-light); }
+  .disagree { background: var(--paper); border: 1.5px dashed var(--accent); border-radius: 10px; padding: 14px 16px; margin-top: 4px; }
+  .disagree .who { font-family: var(--font-display); font-weight: 600; font-size: 1.05rem; color: var(--accent); }
+  .disagree .ch { font-size: .94rem; margin-top: 4px; }
+  details.explain { margin-top: 8px; }
+  details.explain summary { cursor: pointer; font-weight: 600; font-family: var(--font-display); font-size: 1.1rem; }
+  .pos-card { border: 1.5px solid var(--line); border-radius: 8px; padding: 12px 14px; margin-top: 10px; background: var(--paper); }
+  .pos-card .nm { font-weight: 600; color: var(--accent2); }
+  .pos-card .ds { font-size: .9rem; color: var(--muted); margin-top: 2px; }
+  .review-item { background: var(--paper); border: 1.5px solid var(--line); border-radius: 10px; padding: 14px 16px; margin-top: 10px; }
+  .review-item .rv-q { font-family: var(--font-display); font-weight: 600; font-size: .95rem; margin-bottom: 6px; }
+  .review-item .rv-ans { font-size: .88rem; color: var(--accent2); font-weight: 600; }
+  .review-item .rv-tension { font-size: .76rem; color: var(--muted); margin-top: 3px; text-transform: uppercase; letter-spacing: .06em; }
+  .review-item.rv-mid .rv-ans { color: var(--muted); }
+  .review-item.rv-forced { border-left: 4px solid var(--forced); }
+
+  @media print { body { background: #fff; } .no-print { display: none !important; } .panel, .map, .scenario { box-shadow: none; } }
+  .mt { margin-top: 18px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ===== LANDING ===== -->
+<section id="s-landing" class="screen active">
+  <p class="eyebrow">A thinking tool · not a test</p>
+  <h1>Where Do <span class="em">You</span> Stand?</h1>
+  <p class="lede-single">27 real situations. No right answers. Find out where you actually stand — and who you'd have to argue with.</p>
+  <div class="btn-row no-print">
+    <button class="btn btn-primary" onclick="start()">Start →</button>
+  </div>
+  <p class="meta-line no-print">About 10 minutes &nbsp;·&nbsp; Nothing is stored or sent anywhere</p>
+
+  <div class="landing-details no-print">
+    <details>
+      <summary>How it works</summary>
+      <div class="inner">
+        <p>You'll face concrete situations — not abstract propositions — and pick what you'd actually do. A few questions are forced choices: no middle option. Those are the ones that tell you the most.</p>
+        <p style="margin-top:8px">At the end you'll see where you lean across six tensions, get questions to argue about, and find out who you'd disagree with.</p>
+      </div>
+    </details>
+    <details>
+      <summary>The six tensions</summary>
+      <div class="inner">
+        <div class="tension-grid" id="tension-grid"></div>
+      </div>
+    </details>
+    <details>
+      <summary>A note for teachers</summary>
+      <div class="inner">
+        <p>This is a discussion tool, not an assessment. It avoids ideology labels and verdicts. Students see a profile across six tensions, reflection questions tailored to their leanings, a "someone who'd disagree" debate prompt, and optional position overlaps (none pinned to the student). Five forced-choice moments and a "hardest question" screen before results surface genuine political judgement rather than comfortable positions. An answer review lets students trace exactly why their profile sits where it does. Nothing is stored or sent anywhere.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ===== QUIZ ===== -->
+<section id="s-quiz" class="screen">
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="pfill"></div></div>
+    <div class="progress-text"><span id="qn">1</span> / <span id="qt">27</span></div>
+  </div>
+  <div class="scenario" id="scenario-box">
+    <div class="scen-tag" id="scen-tag">SITUATION</div>
+    <div class="scen-text" id="scen-text">—</div>
+    <div class="choices" id="choices"></div>
+    <p class="forced-note no-print" id="forced-note" style="display:none">No middle ground here. Pick the one you'd actually go with.</p>
+  </div>
+  <div class="nav-row no-print">
+    <button class="link-btn" onclick="prev()" id="prevbtn" style="visibility:hidden">← Back</button>
+    <button class="link-btn" id="skipbtn" onclick="skip()">Not sure — skip</button>
+  </div>
+</section>
+
+<!-- ===== HESITATION ===== -->
+<section id="s-hesitation" class="screen">
+  <p class="eyebrow">Before your results</p>
+  <h2>One more thing</h2>
+  <p class="lede-single" style="font-size:1.06rem">Which question made you hesitate longest — where both options felt uncomfortable, or you nearly switched?</p>
+  <div class="hes-grid" id="hes-grid"></div>
+  <p class="hes-scroll-hint" id="hes-scroll-hint" style="display:none">↓ Scroll to see all your questions</p>
+  <div class="btn-row no-print" style="margin-top:22px">
+    <button class="btn btn-primary" onclick="showResults()">See my results →</button>
+    <button class="link-btn" onclick="hesItem=null;showResults()">Skip this</button>
+  </div>
+</section>
+
+<!-- ===== RESULTS ===== -->
+<section id="s-results" class="screen">
+  <p class="res-eyebrow">Your thinking map</p>
+  <h2 id="res-headline">Where you lean</h2>
+  <p class="res-sub" id="res-sub"></p>
+
+  <div class="map" id="lean-map"></div>
+
+  <div class="panel" id="hesitation-panel" style="display:none">
+    <h3>The question you hesitated on</h3>
+    <p class="hint">That hesitation is the most interesting thing here. It means you could see the other side clearly enough to doubt your own answer.</p>
+    <div id="hes-result"></div>
+  </div>
+
+  <div class="panel">
+    <h3>Questions for you</h3>
+    <p class="hint">The interesting part isn't where you landed — it's <em>why</em>, and <em>when you'd switch</em>.</p>
+    <div class="qlist" id="reflect"></div>
+  </div>
+
+  <div class="panel">
+    <h3>Someone who'd disagree</h3>
+    <p class="hint">Good debaters can argue the other side. Here's a person who sees it differently — what would you say to them?</p>
+    <div id="disagree"></div>
+  </div>
+
+  <div class="panel">
+    <h3 style="margin-bottom:8px">Positions people hold</h3>
+    <p class="hint">These are ways of thinking that exist in the world — <strong>not labels for you</strong>. See which overlap with your leanings, and which you'd push back on.</p>
+    <details class="explain"><summary>Show the spectrum of views →</summary><div id="positions"></div></details>
+  </div>
+
+  <div class="panel no-print">
+    <h3 style="margin-bottom:8px">Your answers, question by question</h3>
+    <p class="hint">See exactly how each answer shaped your profile.</p>
+    <details class="explain"><summary>Review my answers →</summary><div id="answer-review"></div></details>
+  </div>
+
+  <div class="btn-row no-print mt">
+    <button class="btn btn-primary" onclick="restart()">↺ Start again</button>
+    <button class="btn btn-secondary" onclick="window.print()">🖨 Print for discussion</button>
+  </div>
+</section>
+
+</div>
+<script>
+const TENSIONS = {
+  FREE:  { name:'Freedom & Order',         pos:'Freedom',  neg:'Order',    q:'When should rules limit what people do?' },
+  ECON:  { name:'Market & State',          pos:'Market',   neg:'State',    q:'Who should run things — business or government?' },
+  WORLD: { name:'Nation & World',          pos:'World',    neg:'Nation',   q:'Look after our own first, or act globally?' },
+  CHANGE:{ name:'Change & Tradition',      pos:'Change',   neg:'Tradition',q:'Remake what we have, or keep what works?' },
+  COMM:  { name:'Rights & Responsibility', pos:'Duty',     neg:'Choice',   q:'Is helping others a duty we all share, or a personal choice?' },
+  TRUST: { name:'Trust & Scrutiny',        pos:'Trust',    neg:'Question', q:'Do those in charge get the benefit of the doubt?' },
+};
+const TKEYS = Object.keys(TENSIONS);
+
+// pos = choice that pushes toward TENSIONS[t].pos (score +1)
+// neg = choice that pushes toward TENSIONS[t].neg (score −1)
+// forced:true = no middle option
+const ITEMS = [
+  // FREEDOM & ORDER (5: 4 standard, 1 forced)
+  {id:'f1',t:'FREE',text:"Your school wants cameras in every corridor. They would stop bullying and theft — but every student is filmed all day.",pos:"No cameras — privacy matters more",neg:"Cameras — safety matters more",middle:true},
+  {id:'f2',t:'FREE',text:"Police could search anyone's phone at a train station without needing a reason, to catch criminals faster. No warrant required.",pos:"Leave phones private",neg:"Allow it — faster results",middle:true},
+  {id:'f3',t:'FREE',text:"Someone posts a racist statement online — targeting a specific group. It isn't a direct threat and doesn't call for violence. Should it be allowed?",pos:"Allow it — even speech we hate should be protected",neg:"Stop it — racist speech causes real harm",middle:true},
+  {id:'f4',t:'FREE',text:"A 10pm curfew for under-18s would cut late-night trouble in your town. You can't opt out, even if you've done nothing wrong.",pos:"No curfew — treat people as innocent",neg:"Curfew is worth it for everyone's safety",middle:true},
+  {id:'f5',t:'FREE',forced:true,text:"Freedom OR security — you can only protect one.\n\nImagine your city faces a real choice: fewer rules, more personal liberty — but more risk. Or strict controls, less crime — but far less freedom. Pick the one you'd actually choose.",pos:"I choose freedom",neg:"I choose security"},
+
+  // MARKET & STATE (5: 4 standard, 1 forced)
+  {id:'e1',t:'ECON',text:"Your town's only bus company keeps raising prices. Some people can no longer afford to travel. Should the council take it over?",pos:"Leave it to the market",neg:"Council should run it",middle:true},
+  {id:'e2',t:'ECON',text:"A company makes a huge profit from an invention. Meanwhile, the people who built it earn ordinary wages. Is the profit gap a good thing or a problem?",pos:"Good — profit rewards the people who took the risk",neg:"Problem — too much goes to too few",middle:true},
+  {id:'e3',t:'ECON',text:"Should government set a high minimum wage — even if some small businesses say it will force them to cut staff or close?",pos:"Let businesses decide wages",neg:"Guarantee a minimum — that's what workers need",middle:true},
+  {id:'e4',t:'ECON',text:"If someone can't find work for months, whose responsibility is it — mainly theirs, or mainly the government's?",pos:"Mainly theirs — keep trying",neg:"Mainly the government's — create the conditions",middle:true},
+  {id:'e5',t:'ECON',forced:true,text:"Lower taxes OR better public services — pick one.\n\nEveryone pays significantly less tax: hospitals, schools, and transport get noticeably worse. Or everyone pays significantly more: services improve substantially. No compromise version exists.",pos:"Lower taxes",neg:"Better public services"},
+
+  // NATION & WORLD (5: 4 standard, 1 forced)
+  {id:'w1',t:'WORLD',text:"A disaster kills thousands in a faraway country. Should your government spend significant money helping — or focus on problems at home first?",pos:"Help abroad",neg:"Home problems first",middle:true},
+  {id:'w2',t:'WORLD',text:"Countries give up some of their own power to a shared body — in exchange for better co-ordinated action on climate change. Worth the loss of control?",pos:"Yes — shared problems need shared authority",neg:"No — keep our own control",middle:true},
+  {id:'w3',t:'WORLD',text:"People fleeing a war want to settle in your country. Accepting more will strain housing, schools, and hospital places. Turning people away means some end up in serious danger.",pos:"Accept more, even with the strain on services",neg:"Limit numbers to protect what we have",middle:true},
+  {id:'w4',t:'WORLD',text:"Your country could buy cheaper goods made abroad — but it means some factories at home close and workers lose their jobs permanently.",pos:"Cheaper from abroad — the overall gain is worth it",neg:"Pay more to protect jobs at home",middle:true},
+  {id:'w5',t:'WORLD',forced:true,text:"Protect jobs OR lower prices — pick one.\n\nYour government puts taxes on imported goods. Prices in shops rise for everyone — but factories stay open and workers keep their jobs. Or no taxes: prices fall, but factories close. No middle ground.",pos:"Lower prices",neg:"Protect jobs"},
+
+  // CHANGE & TRADITION (4: 3 standard, 1 forced)
+  {id:'c1',t:'CHANGE',text:"An old local tradition that some people love excludes others by today's standards. Change it to include everyone — or keep it because it's part of who you are?",pos:"Change it to include everyone",neg:"Keep the tradition",middle:true},
+  {id:'c2',t:'CHANGE',text:"Society is changing faster than it ever has. Is that mostly exciting and good — or are we losing things worth keeping?",pos:"Exciting — change is progress",neg:"We're losing too much, too fast",middle:true},
+  {id:'c3',t:'CHANGE',text:"When something has worked for a long time, is that a good reason to keep it — or irrelevant to whether it still makes sense?",pos:"Irrelevant — what matters is whether it still works",neg:"A good reason — proven things deserve respect",middle:true},
+  {id:'c4',t:'CHANGE',forced:true,text:"Preserve a tradition OR expand inclusion — you can only choose one.\n\nYour community has a long-standing custom. Some people love it; others feel excluded by it. You can preserve it fully — knowing some people are shut out. Or change it completely — knowing some people feel a real loss. Both options hurt someone.",pos:"Expand inclusion",neg:"Preserve the tradition"},
+
+  // RIGHTS & RESPONSIBILITY (4 standard)
+  {id:'m1',t:'COMM',text:"A new park benefits the whole community — but everyone's taxes rise a little, including people who'll never use it. Fair or unfair?",pos:"Fair — shared resources are for everyone",neg:"Unfair — people shouldn't pay for what they don't use",middle:true},
+  {id:'m2',t:'COMM',text:"University places are limited. Should they go mainly to the highest academic achievers — or should places be distributed to give students from disadvantaged backgrounds a fairer shot, even if their grades are lower?",pos:"Distribute places more fairly — background matters",neg:"Highest achievers first — that's what's fair",middle:true},
+  {id:'m3',t:'COMM',text:"Should richer people pay a much higher share of tax so everyone has decent healthcare and schools — even if some say it punishes success?",pos:"Yes — share the benefit more equally",neg:"No — people should keep what they earn",middle:true},
+  {id:'m4',t:'COMM',text:"A person's own choices — smoking, unhealthy eating, risky behaviour — led to serious health problems. Should the community pay for their treatment?",pos:"Yes — that's what healthcare is for, no conditions",neg:"They should bear more of the cost themselves",middle:true},
+
+  // TRUST & SCRUTINY (4 standard — reworked)
+  {id:'t1',t:'TRUST',text:"A scientist paid by a government says a new chemical in the water supply is safe. The government insists there's no risk. Do you trust that, or do you want independent testing?",pos:"Trust it — that's what expertise is for",neg:"I want independent testing before I believe it",middle:true},
+  {id:'t2',t:'TRUST',text:"A protest is getting loud and disruptive. Police move in to break it up — they say it was about to turn violent. Do you take their word for it?",pos:"Yes — police judgement in the moment deserves trust",neg:"No — that's exactly the kind of claim that needs scrutiny",middle:true},
+  {id:'t3',t:'TRUST',text:"A big corporation is accused of covering up harm to its workers. The company denies it. A government investigation clears them. Are you satisfied?",pos:"If the investigation was thorough, yes",neg:"No — companies and governments both have reasons to hide things",middle:true},
+  {id:'t4',t:'TRUST',text:"If a law is in place and authorities are enforcing it, is that enough reason to follow it without question — or should every law justify itself on its own merits?",pos:"Authority and law are enough — it can't function otherwise",neg:"Every law must justify itself — authority alone isn't enough",middle:true},
+];
+
+const POSITIONS = [
+  { nm:'The free-marketeer',   ds:'Trusts businesses and competition more than government; wants people free to choose and to keep what they earn.',        leans:{ECON:+1,COMM:-1,FREE:+1} },
+  { nm:'The social reformer',  ds:'Thinks the community should share resources so everyone has a fair shot; comfortable changing old systems.',               leans:{COMM:+1,ECON:-1,CHANGE:+1} },
+  { nm:'The traditionalist',   ds:'Values what has worked over time, national identity, and a strong sense of order.',                                       leans:{CHANGE:-1,WORLD:-1,FREE:-1} },
+  { nm:'The globalist',        ds:'Sees the biggest problems as shared across borders and worth co-operating on, even at some cost to national control.',    leans:{WORLD:+1,CHANGE:+1} },
+  { nm:'The libertarian',      ds:'Wants maximum personal freedom and minimum interference — from government, community, or authority.',                      leans:{FREE:+1,COMM:-1,TRUST:-1} },
+  { nm:'The sceptic',          ds:"Keeps a close eye on the powerful and questions official accounts — doesn't give the benefit of the doubt.",               leans:{TRUST:-1} },
+  { nm:'The institutionalist', ds:'Believes experts, courts and established authority generally deserve trust and keep society working.',                      leans:{TRUST:+1} },
+  { nm:'The civic communitarian', ds:'Believes individuals have real responsibilities to the community, not just rights from it. Belonging comes with obligations.', leans:{COMM:+1,FREE:-1,TRUST:+1} },
+];
+
+let order=[], idx=0, picks={}, hesItem=null;
+
+function shuffle(a){ a=[...a]; for(let i=a.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[a[i],a[j]]=[a[j],a[i]];} return a; }
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); }
+
+// Build tension grid on load
+(function(){
+  const g=document.getElementById('tension-grid');
+  TKEYS.forEach(k=>{
+    const t=TENSIONS[k];
+    const d=document.createElement('div'); d.className='t-card';
+    d.innerHTML=`<div class="pair">${t.pos}<span class="vs">vs</span>${t.neg}</div><div class="q">${t.q}</div>`;
+    g.appendChild(d);
+  });
+})();
+
+function start(){ order=shuffle(ITEMS); idx=0; picks={}; hesItem=null; document.getElementById('qt').textContent=order.length; show('s-quiz'); render(); }
+
+function render(){
+  const it=order[idx];
+  const isForced=!!it.forced;
+  document.getElementById('qn').textContent=idx+1;
+  document.getElementById('pfill').style.width=((idx)/order.length*100)+'%';
+  document.getElementById('scen-tag').textContent= isForced ? 'FORCED CHOICE' : 'SITUATION '+(idx+1);
+  const box=document.getElementById('scenario-box');
+  box.classList.toggle('is-forced',isForced);
+  // Strip the first-line label from forced text for display
+  let displayText = it.text.replace(/^[A-Z &]+—[^\n]*\n\n?/,'');
+  document.getElementById('scen-text').textContent=displayText;
+  document.getElementById('forced-note').style.display=isForced?'block':'none';
+  document.getElementById('skipbtn').style.visibility=isForced?'hidden':'visible';
+
+  const c=document.getElementById('choices'); c.innerHTML='';
+  const opts=isForced
+    ?[{v:+1,label:it.pos},{v:-1,label:it.neg}]
+    :[{v:+1,label:it.pos},{v:0,label:'It depends / somewhere in between'},{v:-1,label:it.neg}];
+  opts.forEach(o=>{
+    const b=document.createElement('button');
+    b.className='choice'+(isForced?' forced-choice':'')+(picks[it.id]===o.v?' sel':'');
+    b.innerHTML=`<span class="dot"></span><span>${o.label}</span>`;
+    b.onclick=()=>{ picks[it.id]=o.v; if(isForced){ setTimeout(()=>next(),150); } else { next(); } };
+    c.appendChild(b);
+  });
+  document.getElementById('prevbtn').style.visibility=idx>0?'visible':'hidden';
+}
+
+function next(){ if(idx<order.length-1){ idx++; render(); } else finish(); }
+function prev(){ if(idx>0){ idx--; render(); } }
+function skip(){ picks[order[idx].id]=0; next(); }
+
+function finish(){
+  document.getElementById('pfill').style.width='100%';
+  buildHesitationScreen();
+  show('s-hesitation');
+}
+
+function buildHesitationScreen(){
+  const grid=document.getElementById('hes-grid'); grid.innerHTML='';
+  // ALL answered non-forced non-middle questions, in the order they appeared
+  const candidates=order.filter(it=>!it.forced && picks[it.id]!==undefined && picks[it.id]!==0);
+  if(candidates.length>6){
+    document.getElementById('hes-scroll-hint').style.display='block';
+  } else {
+    document.getElementById('hes-scroll-hint').style.display='none';
+  }
+  candidates.forEach(it=>{
+    const v=picks[it.id];
+    const ansLabel=v===1?it.pos:v===-1?it.neg:'In between';
+    const card=document.createElement('div'); card.className='hes-card';
+    card.innerHTML=`<div class="hes-text">${it.text}</div><div class="hes-ans">Your answer: ${ansLabel}</div>`;
+    card.onclick=()=>{
+      document.querySelectorAll('.hes-card').forEach(c=>c.classList.remove('sel'));
+      card.classList.add('sel'); hesItem=it;
+    };
+    grid.appendChild(card);
+  });
+  if(candidates.length===0){
+    // If student skipped everything, just proceed
+    hesItem=null;
+  }
+}
+
+function showResults(){
+  const sc=computeScores();
+  renderResults(sc);
+  show('s-results');
+}
+
+function computeScores(){
+  const sum={},max={};
+  TKEYS.forEach(k=>{sum[k]=0;max[k]=0;});
+  ITEMS.forEach(it=>{
+    const p=picks[it.id];
+    if(p===undefined||p===null) return;
+    sum[it.t]+=p; max[it.t]+=1;
+  });
+  const sc={};
+  TKEYS.forEach(k=>sc[k]=max[k]?Math.round(sum[k]/max[k]*100):0);
+  return sc;
+}
+
+function renderResults(sc){
+  const ranked=TKEYS.slice().sort((a,b)=>Math.abs(sc[b])-Math.abs(sc[a]));
+  const strong=ranked.filter(k=>Math.abs(sc[k])>=34).slice(0,2);
+  const sub=document.getElementById('res-sub');
+  if(strong.length){
+    const phr=strong.map(k=>{const t=TENSIONS[k];return `<b>${sc[k]>0?t.pos:t.neg}</b>`;}).join(' and ');
+    sub.innerHTML=`Your clearest leanings are toward ${phr}. But look at where you sat near the middle — those are the places you're still deciding, and the most interesting to argue about.`;
+  } else {
+    sub.innerHTML=`You sat near the middle on most tensions — you weigh both sides rather than committing hard. That's a real position, not a lack of one. The questions below are where it gets interesting.`;
+  }
+
+  // Lean map
+  const map=document.getElementById('lean-map'); map.innerHTML='';
+  TKEYS.forEach(k=>{
+    const t=TENSIONS[k],v=sc[k];
+    const posLeft=(100-v)/2;
+    let read;
+    if(Math.abs(v)<18) read=`<span class="neutral">Right in the balance — you see both sides.</span>`;
+    else { const pole=v>0?t.pos:t.neg; const str=Math.abs(v)>=60?'strongly':Math.abs(v)>=34?'clearly':'slightly'; read=`You lean ${str} toward <b>${pole}</b>.`; }
+    const row=document.createElement('div'); row.className='lean';
+    row.innerHTML=`<div class="lean-head"><span class="l">${t.pos}</span><span class="r">${t.neg}</span></div>
+      <div class="lean-track"><div class="lean-mid"></div><div class="lean-mark" style="left:${posLeft}%"></div></div>
+      <div class="lean-read">${read}</div>`;
+    map.appendChild(row);
+  });
+
+  // Hesitation panel
+  const hesPanel=document.getElementById('hesitation-panel');
+  if(hesItem){
+    hesPanel.style.display='block';
+    const v=picks[hesItem.id];
+    const ansLabel=v===1?hesItem.pos:v===-1?hesItem.neg:'In between';
+    document.getElementById('hes-result').innerHTML=`<div class="qitem hesitation">
+      <div style="font-weight:600;font-family:var(--font-display);margin-bottom:6px">${hesItem.text}</div>
+      <div style="font-size:.88rem;color:var(--muted)">You answered: <b style="color:var(--ink)">${ansLabel}</b></div>
+      <div style="font-size:.88rem;margin-top:8px">The thing you were weighing against it — what was it, exactly? Can you say it out loud?</div>
+    </div>`;
+  } else { hesPanel.style.display='none'; }
+
+  // Reflection questions
+  const refl=document.getElementById('reflect'); refl.innerHTML='';
+  const neutralK=ranked[ranked.length-1];
+  const targets=[...strong];
+  if(!targets.includes(neutralK)) targets.push(neutralK);
+  const RQ={
+    FREE: v=>`You leaned toward <b>${TENSIONS.FREE[v>0?'pos':'neg']}</b>. Name a real situation where you'd want the opposite — more ${v>0?'control':'freedom'}. What makes that case different?`,
+    ECON: v=>`On who runs things, you leaned <b>${TENSIONS.ECON[v>0?'pos':'neg']}</b>. Is there something you'd never want run that way? Why that one in particular?`,
+    WORLD:v=>`You leaned <b>${TENSIONS.WORLD[v>0?'pos':'neg']}</b>. Where's the limit — when does "${v>0?'help everyone':'look after our own'}" stop being the right call?`,
+    CHANGE:v=>`You leaned toward <b>${TENSIONS.CHANGE[v>0?'pos':'neg']}</b>. Name one thing you'd fight to ${v>0?'change immediately':'keep exactly as it is'}. Does that complicate your lean anywhere?`,
+    COMM: v=>`You leaned toward treating help as <b>${TENSIONS.COMM[v>0?'pos':'neg']}</b>. Where do you draw the line — is there a type of support you think people have no obligation to provide? What makes that one different?`,
+    TRUST:v=>`You leaned toward <b>${TENSIONS.TRUST[v>0?'pos':'neg']}</b>. Name one institution you'd trust far less than others. What specifically did they do — and is it fair to apply that to all of them?`,
+  };
+  targets.forEach(k=>{
+    const v=sc[k]||0;
+    const d=document.createElement('div'); d.className='qitem'+(v<0?' flip':'');
+    d.innerHTML=(RQ[k]?RQ[k](v>=0?1:-1):'');
+    refl.appendChild(d);
+  });
+  const sw=document.createElement('div'); sw.className='qitem';
+  sw.innerHTML=`Across all six, which tension were you <em>least</em> sure about? That's the one worth reading and arguing about most.`;
+  refl.appendChild(sw);
+
+  // Someone who'd disagree
+  const dis=document.getElementById('disagree'); dis.innerHTML='';
+  const topK=strong[0]||ranked[0];
+  const tv=sc[topK]||0;
+  const t=TENSIONS[topK];
+  const theirPole=tv>=0?t.pos:t.neg;
+  const oppPole=tv>=0?t.neg:t.pos;
+  const exItem=ITEMS.find(i=>i.t===topK&&!i.forced);
+  const box=document.createElement('div'); box.className='disagree';
+  box.innerHTML=`<div class="who">Someone who stands for <em>${oppPole}</em></div>
+    <div class="ch">You leaned toward <b>${theirPole}</b>. They'd take the other view — for instance, on this: "${exItem?exItem.text:''}"<br><br>
+    <b>Your task:</b> what's the strongest argument <em>they</em> could make to you — and how would you answer it without just repeating yourself?</div>`;
+  dis.appendChild(box);
+
+  // Positions
+  const pos=document.getElementById('positions'); pos.innerHTML='';
+  POSITIONS.map(p=>{
+    let m=0,n=0;
+    Object.entries(p.leans).forEach(([k,dir])=>{ n++; if(Math.sign(sc[k]||0)===dir&&Math.abs(sc[k])>=18)m++; });
+    return {...p,overlap:n?m/n:0};
+  }).sort((a,b)=>b.overlap-a.overlap).forEach(p=>{
+    const tag=p.overlap>=0.66?'overlaps a lot with your leanings':p.overlap>=0.34?'partly overlaps':"you'd probably push back on this one";
+    const d=document.createElement('div'); d.className='pos-card';
+    d.innerHTML=`<div class="nm">${p.nm} <span style="font-weight:400;color:var(--muted);font-size:.82rem">— ${tag}</span></div><div class="ds">${p.ds}</div>`;
+    pos.appendChild(d);
+  });
+
+  // Answer review
+  const ar=document.getElementById('answer-review'); ar.innerHTML='';
+  order.forEach(it=>{
+    const v=picks[it.id];
+    const ansLabel=v===1?it.pos:v===-1?it.neg:v===0?'In between / skipped':'Not answered';
+    const isMid=(v===0||v===undefined);
+    const isForced=!!it.forced;
+    // Strip the forced label line for display
+    const displayText=it.text.replace(/^[A-Z &]+—[^\n]*\n\n?/,'');
+    const d=document.createElement('div');
+    d.className='review-item'+(isMid?' rv-mid':'')+(isForced?' rv-forced':'');
+    d.innerHTML=`<div class="rv-q">${displayText}</div>
+      <div class="rv-ans">→ ${ansLabel}</div>
+      <div class="rv-tension">${TENSIONS[it.t].name}${isForced?' · forced choice':''}</div>`;
+    ar.appendChild(d);
+  });
+}
+
+function restart(){ show('s-landing'); }
+</script>
+</body>
+</html>
